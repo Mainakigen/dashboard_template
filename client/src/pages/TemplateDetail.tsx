@@ -1,5 +1,5 @@
-import { useParams, Link } from "wouter";
-import { ArrowLeft, Shield, Maximize, Monitor, Tablet, Smartphone, Tag } from "lucide-react";
+import { useParams, Link, useLocation } from "wouter";
+import { ArrowLeft, Shield, Maximize, Tag } from "lucide-react";
 import GalleryShell from "../components/GalleryShell";
 import MarketingSpecimen from "../components/specimens/MarketingSpecimen";
 import CommissionSpecimen from "../components/specimens/CommissionSpecimen";
@@ -15,37 +15,43 @@ const specimenMap: Record<string, React.ReactNode> = {
   "customer-analysis": <CustomerAnalysisSpecimen />,
 };
 
-type RailItemId = "marketing" | "commission" | "sales" | "customer" | "gallery";
+type RailItemId = "marketing" | "commission" | "sales" | "customer-analysis" | "overview";
 
 export default function TemplateDetail() {
   const params = useParams<{ id: string }>();
   const template = templateCatalog.find((t) => t.id === params.id);
-  const [widthMode, setWidthMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [showAnnotations, setShowAnnotations] = useState(false);
+  const [, setLocation] = useLocation();
 
   if (!template) {
     return (
-      <GalleryShell activeItem="gallery" onNavigate={() => {}}>
+      <GalleryShell activeItem="overview" onNavigate={(id) => {
+        if (id === "overview") {
+          setLocation("/");
+        } else {
+          setLocation(`/templates/${id}`);
+        }
+      }}>
         <div className="flex flex-col items-center justify-center py-20">
           <p className="text-graphite-muted mb-4">Template not found.</p>
           <Link href="/" className="text-instrument-green font-semibold hover:underline">
-            Return to gallery
+            Return to overview
           </Link>
         </div>
       </GalleryShell>
     );
   }
 
-  const widthClasses = {
-    desktop: "max-w-[1200px]",
-    tablet: "max-w-[768px]",
-    mobile: "max-w-[375px]",
-  };
-
   const specimen = specimenMap[template.id];
 
   return (
-    <GalleryShell activeItem={template.id as RailItemId} onNavigate={() => {}}>
+    <GalleryShell activeItem={template.id as RailItemId} onNavigate={(id) => {
+      if (id === "overview") {
+        setLocation("/");
+      } else {
+        setLocation(`/templates/${id}`);
+      }
+    }}>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link
@@ -53,7 +59,7 @@ export default function TemplateDetail() {
             className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-graphite hover:border-instrument-green hover:text-instrument-green transition-colors duration-180"
           >
             <ArrowLeft size={14} aria-hidden="true" />
-            Back to gallery
+            Back to overview
           </Link>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-light border border-amber/20 px-2.5 py-0.5 text-xs font-semibold text-amber">
             <Tag size={12} aria-hidden="true" />
@@ -61,26 +67,6 @@ export default function TemplateDetail() {
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-graphite-muted mr-1">Preview width:</span>
-          {(["desktop", "tablet", "mobile"] as const).map((mode) => (
-            <button
-              key={mode}
-              type="button"
-              onClick={() => setWidthMode(mode)}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors duration-180 ${
-                widthMode === mode
-                  ? "border-instrument-green bg-instrument-green-light text-instrument-green"
-                  : "border-gray-300 bg-white text-graphite-muted hover:border-instrument-green"
-              }`}
-              aria-label={`Set ${mode} preview width`}
-              aria-pressed={widthMode === mode}
-            >
-              {mode === "desktop" && <Monitor size={14} aria-hidden="true" />}
-              {mode === "tablet" && <Tablet size={14} aria-hidden="true" />}
-              {mode === "mobile" && <Smartphone size={14} aria-hidden="true" />}
-              {mode}
-            </button>
-          ))}
           <button
             type="button"
             onClick={() => setShowAnnotations(!showAnnotations)}
@@ -97,7 +83,7 @@ export default function TemplateDetail() {
         </div>
       </div>
 
-      <div className={`mx-auto ${widthClasses[widthMode]} transition-all duration-220`}>
+      <div className="mx-auto transition-all duration-220">
         <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden mb-6">
           <div className="flex items-center justify-between px-4 py-3 bg-pale-stone border-b border-gray-200">
             <div>

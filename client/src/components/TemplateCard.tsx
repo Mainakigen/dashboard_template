@@ -1,15 +1,29 @@
-import { Link } from "wouter";
-import { Eye } from "lucide-react";
 import type { TemplateCatalogItem } from "../lib/templateCatalog";
+
+type RailItemId = "marketing" | "commission" | "sales" | "customer-analysis" | "overview";
 
 interface TemplateCardProps {
   template: TemplateCatalogItem;
   aspect?: "wide" | "tall";
+  onNavigate: (id: RailItemId) => void;
 }
 
-export default function TemplateCard({ template, aspect = "wide" }: TemplateCardProps) {
+export default function TemplateCard({ template, aspect = "wide", onNavigate }: TemplateCardProps) {
+  const navigate = () => onNavigate(template.id as RailItemId);
+
   return (
-    <article className="group flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-180 hover:-translate-y-1 hover:shadow-md focus-within:ring-2 focus-within:ring-mineral-blue focus-within:ring-offset-2">
+    <article
+      role="link"
+      tabIndex={0}
+      onClick={navigate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate();
+        }
+      }}
+      className="group flex flex-col rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-180 hover:-translate-y-1 hover:shadow-md cursor-pointer focus:outline-none focus:ring-2 focus:ring-mineral-blue focus:ring-offset-2"
+    >
       <div
         className={`relative overflow-hidden bg-pale-stone ${
           aspect === "tall" ? "aspect-[3/4]" : "aspect-[16/10]"
@@ -36,22 +50,6 @@ export default function TemplateCard({ template, aspect = "wide" }: TemplateCard
           <span className="inline-flex items-center rounded-full border border-gray-200 bg-pale-stone px-2.5 py-0.5 text-xs font-medium text-graphite-muted capitalize">
             {template.previewAspect}
           </span>
-          <Link href={`/templates/${template.id}`}>
-            <span
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  window.location.href = `/templates/${template.id}`;
-                }
-              }}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-md bg-instrument-green px-3 py-1.5 text-xs font-semibold text-white hover:bg-instrument-green/90 focus:outline-none focus:ring-2 focus:ring-mineral-blue focus:ring-offset-2 transition-colors duration-180"
-            >
-              <Eye size={14} aria-hidden="true" />
-              Inspect
-            </span>
-          </Link>
         </div>
       </div>
     </article>

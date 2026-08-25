@@ -2,11 +2,11 @@ import { useState } from "react";
 import { LayoutDashboard, BarChart3, DollarSign, Users, ChevronLeft, ChevronRight, Menu, Shield } from "lucide-react";
 
 const railItems = [
+  { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "marketing", label: "Marketing", icon: BarChart3 },
   { id: "commission", label: "Commission", icon: DollarSign },
   { id: "sales", label: "Sales", icon: LayoutDashboard },
-  { id: "customer", label: "Customer", icon: Users },
-  { id: "gallery", label: "Gallery", icon: BarChart3 },
+  { id: "customer-analysis", label: "Customer", icon: Users },
 ] as const;
 
 type RailItemId = (typeof railItems)[number]["id"];
@@ -32,7 +32,7 @@ export default function GalleryShell({ activeItem, onNavigate, children }: Galle
         <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100">
           {!collapsed && (
             <span className="font-serif text-lg font-semibold text-instrument-green truncate">
-              Northstar
+              Analytics Templates
             </span>
           )}
           <button
@@ -84,7 +84,7 @@ export default function GalleryShell({ activeItem, onNavigate, children }: Galle
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-4 h-14 border-b border-gray-100">
-              <span className="font-serif text-lg font-semibold text-instrument-green">Northstar</span>
+              <span className="font-serif text-lg font-semibold text-instrument-green">Analytics Templates</span>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
@@ -133,7 +133,7 @@ export default function GalleryShell({ activeItem, onNavigate, children }: Galle
           >
             <Menu size={20} aria-hidden="true" />
           </button>
-          <span className="font-serif text-base font-semibold text-instrument-green">Northstar</span>
+          <span className="font-serif text-base font-semibold text-instrument-green">Analytics Templates</span>
           <div className="w-8" />
         </header>
 

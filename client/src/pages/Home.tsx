@@ -1,51 +1,52 @@
 import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
 import GalleryShell from "../components/GalleryShell";
 import GalleryHeader from "../components/GalleryHeader";
 import TemplateCard from "../components/TemplateCard";
 import { templateCatalog } from "../lib/templateCatalog";
 
-type RailItemId = "marketing" | "commission" | "sales" | "customer" | "gallery";
+type RailItemId = "marketing" | "commission" | "sales" | "customer-analysis" | "overview";
 
 export default function Home() {
-  const [activeItem, setActiveItem] = useState<RailItemId>("gallery");
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [activeItem, setActiveItem] = useState<RailItemId>("overview");
   const [searchQuery, setSearchQuery] = useState("");
+  const [, setLocation] = useLocation();
 
   const filteredTemplates = useMemo(() => {
     return templateCatalog.filter((t) => {
-      const matchesCategory = categoryFilter === "All" || t.category === categoryFilter;
-      const matchesSearch =
+      return (
         !searchQuery ||
         t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+        t.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     });
-  }, [categoryFilter, searchQuery]);
+  }, [searchQuery]);
 
   const handleNavigate = (id: RailItemId) => {
     setActiveItem(id);
-    if (id !== "gallery") {
-      window.location.href = `/templates/${id}`;
+    if (id !== "overview") {
+      setLocation(`/templates/${id}`);
     }
   };
 
   return (
     <GalleryShell activeItem={activeItem} onNavigate={handleNavigate}>
       <GalleryHeader
-        title="Template Gallery"
+        title="Overview"
         description="Explore reconstructed dashboard patterns rendered with synthetic data."
         templateCount={filteredTemplates.length}
-        categoryFilter={categoryFilter}
-        onCategoryChange={setCategoryFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
 
-      <section aria-label="Dashboard templates" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTemplates.map((template, idx) => (
-          <div key={template.id} className={idx === 0 ? "md:col-span-2 lg:col-span-2" : ""}>
-            <TemplateCard template={template} aspect={template.previewAspect} />
-          </div>
+      <section aria-label="Dashboard templates" className="grid grid-cols-2 gap-6">
+        {filteredTemplates.map((template) => (
+          <TemplateCard
+            key={template.id}
+            template={template}
+            aspect={template.previewAspect}
+            onNavigate={handleNavigate}
+          />
         ))}
       </section>
 
